@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>Location Page</title>
+  <style>
+    body { font-family: Arial; background: #f8f8f8; margin: 0; }
+    .notice {
+      background-color: #ffecb3;
+      color: #333;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+    marquee {
+  font-size: 20px;
+  font-weight: bold;
+}
+    .container { padding: 20px; }
+    .tool, .comment {
+      background: #fff; border-radius: 8px; padding: 15px;
+      margin-bottom: 20px; box-shadow: 0 0 10px #ccc;
+    }
+    .tool img { max-width: 200px; display: block; margin-top: 10px; }
+    textarea { width: 100%; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+    .social-icons img {
+      width: 32px; height: 32px; margin: 0 5px; vertical-align: middle; cursor: pointer;
+    }
+    footer {
+      text-align: center; margin-top: 10px; padding: 15px;
+      background: #333; color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔔 Top Notice -->
+  <div class="notice" id="topNotice"><marquee>লোড হচ্ছে...</marquee></div>
+
+  <div class="container">
+    <h2>RF News portal</h2>
+    <div id="toolsContainer"></div>
+
+    <div class="comment">
+      <h3>আপনার মন্তব্য লিখুন</h3>
+      <textarea id="commentBox" rows="3" placeholder="মন্তব্য লিখুন..."></textarea><br>
+      <button onclick="saveComment()">মন্তব্য পাঠান</button>
+      <div id="commentsList"></div>
+    </div>
+
+    <div class="social-icons" style="text-align: center; margin-top: 20px;">
+      <a href="https://www.facebook.com/AppDeveloperHasibvai" target="_blank"><img src="https://img.icons8.com/ios-filled/50/facebook-new.png" alt="Facebook"/></a>
+      <a href="https://t.me/+GdqLpwYLmyE2MGQ1" target="_blank"><img src="https://img.icons8.com/ios-filled/50/telegram-app.png" alt="Telegram"/></a>
+      <a href="https://wa.me+8801768970866" target="_blank"><img src="https://img.icons8.com/ios-filled/50/whatsapp.png" alt="WhatsApp"/></a>
+      <a href="https://github.com/Hasibvirus" target="_blank"><img src="https://img.icons8.com/ios-filled/50/github.png" alt="GitHub"/></a>
+    </div>
+  </div>
+
+  <!-- 🔔 Bottom Notice -->
+  <div class="notice" id="bottomNotice"><marquee>লোড হচ্ছে...</marquee></div>
+
+  <!-- Footer -->
+  <footer>
+    © All Rights Reserved 2025<br>
+    Developer By Md Hasib
+  </footer>
+
+  <script>
+    // Show top notice
+    const topNoticeText = localStorage.getItem("noticeTop") || "কোনো নোটিশ নেই";
+    document.getElementById("topNotice").innerHTML = `<marquee>${topNoticeText}</marquee>`;
+
+    // Show bottom notice
+    const bottomNoticeText = localStorage.getItem("noticeBottom") || "কোনো নোটিশ নেই";
+    document.getElementById("bottomNotice").innerHTML = `<marquee>${bottomNoticeText}</marquee>`;
+
+    // Load tools (within 24 hours)
+    const tools = JSON.parse(localStorage.getItem("tools")) || [];
+    const now = new Date().getTime();
+    const container = document.getElementById("toolsContainer");
+
+    const validTools = tools.filter(tool => {
+      return (now - tool.createdAt) < 86400000; // 24hr
+    });
+
+    if (validTools.length !== tools.length) {
+      localStorage.setItem("tools", JSON.stringify(validTools));
+    }
+
+    if (validTools.length === 0) {
+      container.innerHTML = "<p>এই মুহূর্তে কোনো টুলস পাওয়া যায়নি।</p>";
+    } else {
+      validTools.forEach(tool => {
+        const div = document.createElement("div");
+        div.className = "tool";
+        div.innerHTML = `
+          <h3>${tool.name}</h3>
+          <p>${tool.details}</p>
+          <img src="${tool.image}" alt="${tool.name}">
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Comments
+    function saveComment() {
+      const commentText = document.getElementById("commentBox").value.trim();
+      if (!commentText) return;
+
+      let comments = JSON.parse(localStorage.getItem("comments")) || [];
+      comments.push(commentText);
+      localStorage.setItem("comments", JSON.stringify(comments));
+      document.getElementById("commentBox").value = "";
+      loadComments();
+    }
+
+    function loadComments() {
+      const commentDiv = document.getElementById("commentsList");
+      const comments = JSON.parse(localStorage.getItem("comments")) || [];
+      commentDiv.innerHTML = comments.map(c => `<p>${c}</p>`).join("");
+    }
+
+    loadComments();
+  </script>
+</body>
+</html>

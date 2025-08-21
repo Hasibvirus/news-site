@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Page</title>
+  <style>
+    body { font-family: Arial; background: #f2f2f2; padding: 20px; }
+    .container {
+      background: #fff; padding: 20px; max-width: 600px; margin: auto;
+      border-radius: 8px; box-shadow: 0 0 10px #ccc;
+    }
+    input, textarea, button {
+      width: 100%; padding: 10px; margin-bottom: 15px;
+      border-radius: 5px; border: 1px solid #ccc; font-size: 16px;
+    }
+    button {
+      background-color: #28a745; color: white; border: none; cursor: pointer;
+    }
+    .message {
+      text-align: center; font-weight: bold; color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>নিউজ এড করুন</h2>
+    
+    <input type="text" id="noticeTop" placeholder="প্রথম নোটিশ (উপরের জন্য)" />
+    <input type="text" id="noticeBottom" placeholder="২য় নোটিশ (নিচের জন্য)" />
+    
+    <input type="text" id="name" placeholder="নিউজের হেডলাইন ও তারিখ লিখুন" required />
+    <input type="file" id="image" accept="image/*" required />
+    <textarea id="details" placeholder="বিস্তারিত লিখুন" rows="4" required></textarea>
+    
+    <button onclick="addTool()">Add</button>
+    <p class="message" id="messageBox"></p>
+  </div>
+
+  <script>
+    function addTool() {
+      const name = document.getElementById("name").value.trim();
+      const imageFile = document.getElementById("image").files[0];
+      const details = document.getElementById("details").value.trim();
+      const noticeTop = document.getElementById("noticeTop").value.trim();
+      const noticeBottom = document.getElementById("noticeBottom").value.trim();
+      const messageBox = document.getElementById("messageBox");
+
+      if (!name || !imageFile || !details) {
+        messageBox.style.color = "red";
+        messageBox.textContent = "সব তথ্য দিন।";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imageData = e.target.result;
+        const createdAt = new Date().getTime();
+
+        const tool = { name, details, image: imageData, createdAt };
+
+        let tools = JSON.parse(localStorage.getItem("tools")) || [];
+        tools.push(tool);
+        localStorage.setItem("tools", JSON.stringify(tools));
+
+        if (noticeTop) {
+          localStorage.setItem("noticeTop", noticeTop);
+        }
+
+        if (noticeBottom) {
+          localStorage.setItem("noticeBottom", noticeBottom);
+        }
+
+        document.getElementById("name").value = "";
+        document.getElementById("image").value = "";
+        document.getElementById("details").value = "";
+        document.getElementById("noticeTop").value = "";
+        document.getElementById("noticeBottom").value = "";
+
+        messageBox.style.color = "green";
+        messageBox.textContent = "Add Successful!";
+      };
+
+      reader.readAsDataURL(imageFile);
+    }
+  </script>
+</body>
+</html>
